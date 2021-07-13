@@ -13,12 +13,8 @@ import java.util.Date;
 
 @Component
 public class CustomDateDeserializer extends StdDeserializer<Date> {
-
-    /**
-     *
-     */
     private static final long serialVersionUID = 1L;
-    private SimpleDateFormat formatter = new SimpleDateFormat("MM-dd-yyyy"); // specify your specific timezone
+    private SimpleDateFormat formatter = new SimpleDateFormat("MM/dd/yyyy");
 
     public CustomDateDeserializer() {
         this(null);

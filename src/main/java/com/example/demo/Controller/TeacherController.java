@@ -16,13 +16,13 @@ public class TeacherController {
     private TeacherRepository teacherRepository;
     @GetMapping("api/teacher/list")
     public @ResponseBody
-    ResponseEntity getShiftList(){
-        List<Teacher> subjectList = teacherRepository.findAll();
-        return new ResponseEntity(subjectList, HttpStatus.OK);
+    ResponseEntity getTeacherList(){
+        List<Teacher> teacherList = teacherRepository.findAll();
+        return new ResponseEntity(teacherList, HttpStatus.OK);
     }
 
     @PostMapping("api/teacher")
-    public @ResponseBody ResponseEntity createSubject(@RequestBody Teacher teacher){
+    public @ResponseBody ResponseEntity createTeacher(@RequestBody Teacher teacher){
         if(teacher.getName().trim().compareTo("") == 0){
             return new ResponseEntity(HttpStatus.BAD_REQUEST);
         }
@@ -32,5 +32,14 @@ public class TeacherController {
         }
         teacherRepository.save(teacher);
         return new ResponseEntity(HttpStatus.OK);
+    }
+
+    @GetMapping("api/teacher")
+    public @ResponseBody ResponseEntity getTeacher(@RequestParam("email") String teacherEmail){
+        Teacher teacherForResponse = teacherRepository.getByEmail(teacherEmail);
+        if(teacherForResponse == null){
+            return new ResponseEntity(HttpStatus.NOT_FOUND);
+        }
+        return new ResponseEntity(teacherForResponse, HttpStatus.OK);
     }
 }

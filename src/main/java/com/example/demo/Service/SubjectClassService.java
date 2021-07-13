@@ -9,6 +9,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
+import java.util.List;
 import java.util.Optional;
 
 @Service
@@ -20,7 +21,10 @@ public class SubjectClassService {
     TeacherRepository teacherRepository;
 
     @Autowired
-    SubjectRepository subjectRepository;
+    SubjectService subjectService;
+    @Autowired
+    TeacherService teacherService;
+
     public SubjectClass getById(Integer id){
         return subjectClassRepository.getById(id);
     }
@@ -28,9 +32,7 @@ public class SubjectClassService {
     public SubjectClass addSubjectClass(SubjectClassDTO subjectClassDTO){
         Teacher teacher = new Teacher();
         Subject subject = new Subject();
-        TeacherService teacherService = new TeacherService();
         Optional<Teacher> teacherOptional = teacherService.findById(subjectClassDTO.getTeacherId());
-        SubjectService subjectService = new SubjectService();
         Optional<Subject> subjectOptional = subjectService.findById(subjectClassDTO.getSubjectId());
         if(teacherOptional.isPresent()){
             teacher = teacherOptional.get();
@@ -57,5 +59,15 @@ public class SubjectClassService {
     public ArrayList<SubjectClass> getBySubjectId(Integer subjectId, Integer teacherId) {
         ArrayList<SubjectClass> subjectClassArrayList = subjectClassRepository.getBySubjectIdAndTeacherId(subjectId, teacherId);
         return subjectClassArrayList;
+    }
+
+    public List<SubjectClass> getByTeacherUserName(String userName) {
+        Teacher teacher = teacherRepository.getByEmail(userName);
+        ArrayList<SubjectClass> subjectClassArrayList = subjectClassRepository.getByTeacher(teacher);
+        return subjectClassArrayList;
+    }
+
+    public List<SubjectClass> getByTeacherId(Integer teacherId) {
+
     }
 }

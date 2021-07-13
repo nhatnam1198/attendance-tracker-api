@@ -1,7 +1,9 @@
 package com.example.demo.DTO;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
+import org.springframework.format.annotation.DateTimeFormat;
 
+import java.time.LocalDate;
 import java.util.Date;
 
 public class EventDTO {
@@ -9,8 +11,9 @@ public class EventDTO {
     private String name;
     private Integer shiftId;
     private Integer subjectClassId;
-//    @JsonFormat(shape=JsonFormat.Shape.STRING, pattern="MM-dd-yyyy")
-    private Date dateTime;
+    @JsonFormat(shape=JsonFormat.Shape.STRING, pattern="MM/dd/yyyy")
+//    @DateTimeFormat(pattern = "MM/dd/yyyy")
+    private LocalDate dateTime;
 
     public Integer getId() {
         return id;
@@ -44,11 +47,11 @@ public class EventDTO {
         this.subjectClassId = subjectClassId;
     }
 
-    public Date getDateTime() {
+    public LocalDate getDateTime() {
         return dateTime;
     }
 
-    public void setDateTime(Date dateTime) {
+    public void setDateTime(LocalDate dateTime) {
         this.dateTime = dateTime;
     }
 

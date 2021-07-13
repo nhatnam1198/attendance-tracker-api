@@ -32,9 +32,15 @@ public class SubjectClassController {
 
     @GetMapping("api/subjectClass/list")
     public @ResponseBody
-    ResponseEntity<ArrayList<SubjectClass>> getBySubjectId(Integer subjectId, Integer teacherId){
+    ResponseEntity<ArrayList<SubjectClass>> getBySubjectIdAndTeacherId(Integer subjectId, Integer teacherId){
         List<SubjectClass> subjectClassArrayList = subjectClassService.getBySubjectId(subjectId, teacherId);
+        return new ResponseEntity(subjectClassArrayList, HttpStatus.OK);
+    }
 
+    @GetMapping("api/subjectClass/teacher/list")
+    public @ResponseBody
+    ResponseEntity<ArrayList<SubjectClass>> getByTeacherId(@RequestParam("teacherId") Integer teacherId){
+        List<SubjectClass> subjectClassArrayList = subjectClassService.getByTeacherId(teacherId);
         return new ResponseEntity(subjectClassArrayList, HttpStatus.OK);
     }
 }

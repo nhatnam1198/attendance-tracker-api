@@ -5,6 +5,15 @@ public class StudentDTO {
     private String name;
     private String email;
     private String studentCode;
+    private byte[] profileImage;
+
+    public byte[] getProfileImage() {
+        return profileImage;
+    }
+
+    public void setProfileImage(byte[] profileImage) {
+        this.profileImage = profileImage;
+    }
 
     public String getStudentCode() {
         return studentCode;

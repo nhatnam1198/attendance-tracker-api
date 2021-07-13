@@ -25,6 +25,8 @@ public class Attendance {
     @JoinColumn(name = "student_id")
     private Student student;
 
+
+
     public Integer getId() {
         return id;
     }

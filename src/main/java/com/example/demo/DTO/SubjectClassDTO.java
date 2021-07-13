@@ -6,6 +6,7 @@ import com.example.demo.Model.Teacher;
 import com.fasterxml.jackson.annotation.JsonFormat;
 
 import javax.persistence.*;
+import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
@@ -20,19 +21,19 @@ public class SubjectClassDTO {
         this.name = name;
     }
 
-    public Date getStartDateTime() {
+    public LocalDate getStartDateTime() {
         return startDateTime;
     }
 
-    public void setStartDateTime(Date startDateTime) {
+    public void setStartDateTime(LocalDate startDateTime) {
         this.startDateTime = startDateTime;
     }
 
-    public Date getEndDateTime() {
+    public LocalDate getEndDateTime() {
         return endDateTime;
     }
 
-    public void setEndDateTime(Date endDateTime) {
+    public void setEndDateTime(LocalDate endDateTime) {
         this.endDateTime = endDateTime;
     }
 
@@ -43,11 +44,11 @@ public class SubjectClassDTO {
     public void setStatus(int status) {
         this.status = status;
     }
-    @JsonFormat(shape=JsonFormat.Shape.STRING, pattern="MM-dd-yyyy")
-    private Date startDateTime;
+//    @JsonFormat(shape=JsonFormat.Shape.STRING, pattern="MM-dd-yyyy")
+    private LocalDate startDateTime;
 
-    @JsonFormat(shape=JsonFormat.Shape.STRING, pattern="MM-dd-yyyy")
-    private Date endDateTime;
+//    @JsonFormat(shape=JsonFormat.Shape.STRING, pattern="MM-dd-yyyy")
+    private LocalDate endDateTime;
 
     private int status;
     private Integer subjectId;

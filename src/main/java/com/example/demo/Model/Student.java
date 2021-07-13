@@ -21,10 +21,22 @@ public class Student {
     @Column(name = "email")
     private String email;
 
-    @JsonIgnore
+    @Column(name = "student_code")
+    private String studentCode;
+
+//    @JsonIgnore
     @OneToMany(mappedBy = "student", cascade = CascadeType.ALL)
     private List<EmbeddedImage> embeddedImages = new ArrayList<>();
+    @Transient
+    private byte[] profileImage;
 
+    public byte[] getProfileImage() {
+        return profileImage;
+    }
+
+    public void setProfileImage(byte[] profileImage) {
+        this.profileImage = profileImage;
+    }
     public List<EmbeddedImage> getEmbeddedImages() {
         return embeddedImages;
     }
@@ -49,6 +61,13 @@ public class Student {
         return name;
     }
 
+    public String getStudentCode() {
+        return studentCode;
+    }
+
+    public void setStudentCode(String studentCode) {
+        this.studentCode = studentCode;
+    }
 
     public void setName(String name) {
         this.name = name;

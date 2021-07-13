@@ -7,6 +7,7 @@ import com.example.demo.Model.Student;
 import com.example.demo.Service.AttendanceDetailService;
 import com.example.demo.Service.EventService;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import jdk.internal.org.objectweb.asm.TypeReference;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -26,10 +27,6 @@ public class AttendanceDetailController {
     @PostMapping("api/attendanceDetail")
     public @ResponseBody
     ResponseEntity addAttendanceDetail(@RequestBody HashMap<String, Object> map) {
-        //boolean isExists = AttendanceDetailService.isExist(AttendanceDetail);
-//        if(isExists){
-//            return new ResponseEntity(HttpStatus.CONFLICT);
-//        }
         if(!map.containsKey("attendedStudentList") || !map.containsKey("event")){
             return new ResponseEntity(HttpStatus.BAD_REQUEST);
         }
@@ -41,7 +38,8 @@ public class AttendanceDetailController {
             newStudent = new ObjectMapper().convertValue(object, Student.class);
             attendedStudentList.add(newStudent);
         }
-        Event event = new ObjectMapper().convertValue(map.get("event"), Event.class);
+
+        Event event = new ObjectMapper().registerModule(new JavaTimeModule()).convertValue(map.get("event"), Event.class);
 
         if(attendanceDetailService.isExistsByEventId(event.getId())){
             return new ResponseEntity(HttpStatus.CONFLICT);
@@ -67,6 +65,11 @@ public class AttendanceDetailController {
     @PutMapping("api/attendanceDetail/absence")
     public @ResponseBody ResponseEntity approveLeaveOfAbsenceRequest(@RequestBody Integer attendanceId){
         attendanceDetailService.approveLeaveOfAbsenceRequest(attendanceId);
+        return new ResponseEntity(HttpStatus.OK);
+    }
+    @PutMapping("api/attendanceDetail")
+    public @ResponseBody ResponseEntity updateAttendanceDetail(@RequestBody ArrayList<AttendanceDetails> attendanceDetailsArrayList){
+        attendanceDetailService.updateAttendanceDetail(attendanceDetailsArrayList);
         return new ResponseEntity(HttpStatus.OK);
     }
 }

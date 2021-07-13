@@ -5,6 +5,7 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 
 import javax.persistence.*;
+import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
@@ -52,19 +53,19 @@ public class SubjectClass {
         this.name = name;
     }
 
-    public Date getStartDateTime() {
+    public LocalDate getStartDateTime() {
         return startDateTime;
     }
 
-    public void setStartDateTime(Date startDateTime) {
+    public void setStartDateTime(LocalDate startDateTime) {
         this.startDateTime = startDateTime;
     }
 
-    public Date getEndDateTime() {
+    public LocalDate getEndDateTime() {
         return endDateTime;
     }
 
-    public void setEndDateTime(Date endDateTime) {
+    public void setEndDateTime(LocalDate endDateTime) {
         this.endDateTime = endDateTime;
     }
 
@@ -75,13 +76,13 @@ public class SubjectClass {
     public void setStatus(int status) {
         this.status = status;
     }
-    @JsonFormat(shape=JsonFormat.Shape.STRING, pattern="MM-dd-yyyy")
+//    @JsonFormat(shape=JsonFormat.Shape.STRING, pattern="MM-dd-yyyy")
     @Column(name = "start_date_time")
-    private Date startDateTime;
+    private LocalDate startDateTime;
 
-    @JsonFormat(shape=JsonFormat.Shape.STRING, pattern="MM-dd-yyyy")
+//    @JsonFormat(shape=JsonFormat.Shape.STRING, pattern="MM-dd-yyyy")
     @Column(name = "end_date_time")
-    private Date endDateTime;
+    private LocalDate endDateTime;
 
     @Column(name = "status")
     private int status;

@@ -7,6 +7,7 @@ import java.io.Serializable;
 
 @Entity
 @Table(name = "embedded_image")
+@JsonIgnoreProperties({"hibernateLazyInitializer", "handler", "student"})
 public class EmbeddedImage {
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)

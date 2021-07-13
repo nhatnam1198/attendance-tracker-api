@@ -137,19 +137,20 @@ public class StudentController {
             return new ResponseEntity("Empty", HttpStatus.OK);
         }
 
-        Student student2 = new Student();
+        Student studentDto = new Student();
         ArrayList<StudentDTO> studentDTOArrayList = new ArrayList<>();
         Set<Integer> studentIdSet = new HashSet<>();
         for(int i = 0; i< imageEmbeddingList.size(); i++){
 
-            student2 = studentRepository.findByEmbeddedImageId(imageEmbeddingList.get(i));
+            studentDto = (Student) studentRepository.findByEmbeddedImageId(imageEmbeddingList.get(i));
             StudentDTO studentDTO = new StudentDTO();
-            Integer studentId = student2.getId();
+            Integer studentId = studentDto.getId();
             if(!studentIdSet.contains(studentId)){
-                studentIdSet.add(student2.getId());
-                studentDTO.setId(student2.getId());
-                studentDTO.setName(student2.getName());
-                studentDTO.setEmail(student2.getEmail());
+                studentIdSet.add(studentDto.getId());
+                studentDTO.setId(studentDto.getId());
+                studentDTO.setName(studentDto.getName());
+                studentDTO.setEmail(studentDto.getEmail());
+                studentDTO.setProfileImage(studentDto.getProfileImage());
                 studentDTOArrayList.add(studentDTO);
             }else{
                 continue;

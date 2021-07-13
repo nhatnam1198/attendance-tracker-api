@@ -29,7 +29,7 @@ public class AttendanceController {
     }
     @GetMapping("api/attendance/list")
     public @ResponseBody
-    ResponseEntity getEventByDate(@RequestParam("subjectClassId")Integer subjectClassId){
+    ResponseEntity getAttendanceBySubjectClassId(@RequestParam("subjectClassId")Integer subjectClassId){
         ArrayList<Attendance> attendanceArrayList = attendanceService.getAttendanceListBySubjectClassId(subjectClassId);
         return new ResponseEntity(attendanceArrayList, HttpStatus.OK);
     }

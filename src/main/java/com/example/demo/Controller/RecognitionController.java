@@ -13,6 +13,7 @@ import com.google.gson.Gson;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
+import org.apache.commons.compress.utils.IOUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.*;
 import org.springframework.util.LinkedMultiValueMap;
@@ -23,6 +24,9 @@ import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.client.RestTemplate;
 import org.springframework.web.multipart.MultipartFile;
 
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
@@ -139,11 +143,11 @@ public class RecognitionController {
         }
 
         Student student = new Student();
-
         ArrayList<StudentDTO> studentList = new ArrayList<>();
         Set<Integer> studentIdSet = new HashSet<>();
         for(int i = 0; i< imageEmbeddingList.size(); i++){
             StudentDTO studentDTO = new StudentDTO();
+            String profileImagePath = "";
             student = studentRepository.findByEmbeddedImageId(imageEmbeddingList.get(i));
             Integer studentId = student.getId();
             if(!studentIdSet.contains(studentId)){
@@ -151,9 +155,20 @@ public class RecognitionController {
                 studentDTO.setId(studentId);
                 studentDTO.setName(student.getName());
                 studentDTO.setEmail(student.getEmail());
-                studentList.add(studentDTO);
-            }else{
-                continue;
+                if(student.getEmbeddedImages() != null && student.getEmbeddedImages().size() != 0){
+                    profileImagePath = student.getEmbeddedImages().get(0).getFilePath();
+                }
+                if(profileImagePath != null && profileImagePath.compareTo("") != 0){
+                    try {
+                        FileInputStream inputStream = new FileInputStream(Const.IMAGE_STORAGE_PATH + profileImagePath);
+                        byte[] bytes = IOUtils.toByteArray(inputStream);
+                        studentDTO.setProfileImage(bytes);
+                        studentList.add(studentDTO);
+                    } catch (IOException e) {
+                        e.printStackTrace();
+                        studentList.add(studentDTO);
+                    }
+                }
             }
         }
         return new ResponseEntity(studentList, HttpStatus.OK);

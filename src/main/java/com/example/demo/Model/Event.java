@@ -6,6 +6,7 @@ import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import org.springframework.format.annotation.DateTimeFormat;
 
 import javax.persistence.*;
+import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
@@ -22,7 +23,7 @@ public class Event {
         return id;
     }
 
-    @JsonIgnore
+
     @OneToMany(mappedBy = "event", cascade = CascadeType.ALL)
     private List<AttendanceDetails> attendanceDetailsList = new ArrayList<>();
 
@@ -41,11 +42,12 @@ public class Event {
     private SubjectClass subjectClass;
 
 //    @JsonFormat(shape=JsonFormat.Shape.STRING, pattern="MM-dd-yyyy", timezone = "UTC+07:00")
-//    @JsonFormat(pattern="MM-dd-yyyy", timezone = "UTC+7")
-    @JsonDeserialize(using = CustomDateDeserializer.class)
-    @Temporal(TemporalType.DATE)
+
+//    @JsonDeserialize(using = CustomDateDeserializer.class)
+//    @JsonFormat(pattern="MM/dd/yyyy", timezone = "UTC+7")
+//    @Temporal(TemporalType.DATE)
     @Column(name = "date_time", nullable = false)
-    private Date dateTime;
+    private LocalDate dateTime;
 
     @Column(name = "status", nullable = false)
     private int status;
@@ -86,11 +88,11 @@ public class Event {
         this.subjectClass = subjectClass;
     }
 
-    public Date getDateTime() {
+    public LocalDate getDateTime() {
         return dateTime;
     }
 
-    public void setDateTime(Date dateTime) {
+    public void setDateTime(LocalDate dateTime) {
         this.dateTime = dateTime;
     }
 

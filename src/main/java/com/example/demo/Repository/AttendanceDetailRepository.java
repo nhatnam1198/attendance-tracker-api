@@ -10,9 +10,12 @@ import java.util.List;
 
 public interface AttendanceDetailRepository extends JpaRepository<AttendanceDetails, Integer> {
 
-    AttendanceDetails findByEventIdAndStatusNotIn(Integer integer, ArrayList<Integer> status);
+    ArrayList<AttendanceDetails> findByEventIdAndStatusNotIn(Integer integer, ArrayList<Integer> status);
 
     ArrayList<AttendanceDetails> findByEventId(Integer eventId);
     ArrayList<AttendanceDetails> findByEventIdAndStatusIn(Integer eventId, List<Integer> status);
     AttendanceDetails findByAttendanceId(Integer attendanceId);
+
+    @Override
+    ArrayList<AttendanceDetails> findAllById(Iterable<Integer> iterable);
 }

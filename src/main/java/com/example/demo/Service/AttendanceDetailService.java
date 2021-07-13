@@ -9,14 +9,15 @@ import com.example.demo.Model.Student;
 import com.example.demo.Repository.AttendanceDetailRepository;
 import com.example.demo.Repository.AttendanceRepository;
 import com.example.demo.Repository.EventRepository;
+import org.apache.commons.compress.utils.IOUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
+import java.io.IOException;
 import java.lang.reflect.Array;
-import java.util.ArrayList;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Optional;
+import java.util.*;
 
 @Service
 public class AttendanceDetailService {
@@ -78,7 +79,7 @@ public class AttendanceDetailService {
         ArrayList<Integer> status = new ArrayList<>();
         status.add(Const.LEAVE_OF_ABSENCE_REQUEST);
         status.add(Const.ALLOWED);
-        if(attendanceDetailRepository.findByEventIdAndStatusNotIn(eventId, status) == null){
+        if(attendanceDetailRepository.findByEventIdAndStatusNotIn(eventId, status) == null || attendanceDetailRepository.findByEventIdAndStatusNotIn(eventId, status).size() == 0){
             return false;
         }
         return true;
@@ -86,6 +87,25 @@ public class AttendanceDetailService {
 
     public ArrayList<AttendanceDetails> getAttendedResultList(Integer eventId) {
         ArrayList<AttendanceDetails> attendanceArrayList = attendanceDetailRepository.findByEventId(eventId);
+        for(int i = 0; i< attendanceArrayList.size(); i++){
+//            if(attendanceArrayList.get(i).getAttendance().getStudent().getEmbeddedImages() != null && attendanceArrayList.get(i).getAttendance().getStudent().getEmbeddedImages().size() != 0){
+//                profileImagePath = attendance.getStudent().getEmbeddedImages().get(0).getFilePath();
+//            }
+//            if(profileImagePath != null && profileImagePath.compareTo("") != 0){
+//                try {
+//                    FileInputStream inputStream = new FileInputStream(Const.IMAGE_STORAGE_PATH + profileImagePath);
+//                    byte[] bytes = IOUtils.toByteArray(inputStream);
+//                    attendance.getStudent().setProfileImage(bytes);
+//                } catch (FileNotFoundException e) {
+//                    e.printStackTrace();
+//                    continue;
+//                } catch (IOException e) {
+//                    e.printStackTrace();
+//                    continue;
+//                }
+//            }
+        }
+
         return attendanceArrayList;
     }
 
@@ -101,5 +121,24 @@ public class AttendanceDetailService {
         AttendanceDetails attendanceDetailToUpdate = attendanceDetailRepository.findByAttendanceId(attendanceId);
         attendanceDetailToUpdate.setStatus(Const.ALLOWED);
         attendanceDetailRepository.save(attendanceDetailToUpdate);
+    }
+
+    public void updateAttendanceDetail(ArrayList<AttendanceDetails> attendanceDetailsArrayList) {
+        ArrayList<Integer> attendanceDetailIds = new ArrayList<>();
+        HashMap<Integer, Integer> statusMap = new HashMap<>();
+        for (AttendanceDetails attendanceDetails:
+             attendanceDetailsArrayList) {
+            attendanceDetailIds.add(attendanceDetails.getId());
+            statusMap.putIfAbsent(attendanceDetails.getId(), attendanceDetails.getStatus());
+        }
+        ArrayList<AttendanceDetails> attendanceDetailsToUpdate = attendanceDetailRepository.findAllById(attendanceDetailIds);
+
+        for(int i = 0; i< attendanceDetailsToUpdate.size(); i++){
+            AttendanceDetails attendanceDetail = attendanceDetailsToUpdate.get(i);
+            if(statusMap.containsKey(attendanceDetail.getId())){
+                attendanceDetail.setStatus(statusMap.get(attendanceDetail.getId()));
+                attendanceDetailRepository.save(attendanceDetail);
+            }
+        }
     }
 }
