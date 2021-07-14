@@ -11,7 +11,7 @@ import java.util.Date;
 public interface EventRepository extends JpaRepository<Event, Integer> {
     boolean existsByDateTimeAndShiftId(LocalDate dateTime, Integer shiftId);
 
-    ArrayList<Event> getByDateTimeAndSubjectClass(LocalDate date, SubjectClass subjectClass);
+    ArrayList<Event> getByDateTime(LocalDate date);
     ArrayList<Event> getBySubjectClassId(Integer subjectClassId);
 
     void deleteById(Integer eventId);

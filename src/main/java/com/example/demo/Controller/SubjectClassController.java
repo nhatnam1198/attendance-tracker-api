@@ -32,8 +32,8 @@ public class SubjectClassController {
 
     @GetMapping("api/subjectClass/list")
     public @ResponseBody
-    ResponseEntity<ArrayList<SubjectClass>> getBySubjectIdAndTeacherId(Integer subjectId, Integer teacherId){
-        List<SubjectClass> subjectClassArrayList = subjectClassService.getBySubjectId(subjectId, teacherId);
+    ResponseEntity<ArrayList<SubjectClass>> getBySubjectIdAndTeacherEmail(@RequestParam("subjectId") Integer subjectId, @RequestParam("email") String teacherEmail){
+        List<SubjectClass> subjectClassArrayList = subjectClassService.getBySubjectId(subjectId, teacherEmail);
         return new ResponseEntity(subjectClassArrayList, HttpStatus.OK);
     }
 

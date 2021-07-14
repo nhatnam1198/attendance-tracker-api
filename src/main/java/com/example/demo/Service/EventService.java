@@ -89,16 +89,18 @@ public class EventService {
         return eventRepository.save(eventToUpdate);
     }
     public ArrayList<Event> getEventByDateAndUserName(String date, String userName) {
-        List<SubjectClass> subjectClassList = subjectClassService.getByTeacherUserName(userName);
         DateTimeFormatter dateTimeFormatter = DateTimeFormatter.ofPattern("yyyy-M-d");
         LocalDate localDate = LocalDate.parse(date, dateTimeFormatter);
-        for(int i = 0; i< subjectClassList.size(); i++){
-            ArrayList<Event> eventArrayList = eventRepository.getByDateTimeAndSubjectClass(localDate, subjectClassList.get(i));
-            if(eventArrayList != null){
-                return eventArrayList;
+        ArrayList<Event> eventArrayList = eventRepository.getByDateTime(localDate);
+        ArrayList<Event> filteredEventList  = new ArrayList<>();
+        for(int i = 0; i< eventArrayList.size(); i++){
+            Event event = eventArrayList.get(i);
+            String teacherName = event.getSubjectClass().getTeacher().getEmail();
+            if(teacherName.equals(userName)){
+                filteredEventList.add(event);
             }
         }
-        return  new ArrayList<Event>();
+        return filteredEventList;
     }
 
     public ArrayList<Event> getEventListBySubjectClassId(Integer subjectClassId) {

@@ -56,8 +56,8 @@ public class SubjectClassService {
         return isExists;
     }
 
-    public ArrayList<SubjectClass> getBySubjectId(Integer subjectId, Integer teacherId) {
-        ArrayList<SubjectClass> subjectClassArrayList = subjectClassRepository.getBySubjectIdAndTeacherId(subjectId, teacherId);
+    public ArrayList<SubjectClass> getBySubjectId(Integer subjectId, String email) {
+        ArrayList<SubjectClass> subjectClassArrayList = subjectClassRepository.getBySubjectIdAndTeacherEmail(subjectId, email);
         return subjectClassArrayList;
     }
 
@@ -68,6 +68,6 @@ public class SubjectClassService {
     }
 
     public List<SubjectClass> getByTeacherId(Integer teacherId) {
-
+        return subjectClassRepository.getByTeacherId(teacherId);
     }
 }

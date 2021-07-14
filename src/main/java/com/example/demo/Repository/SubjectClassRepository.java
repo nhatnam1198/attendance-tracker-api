@@ -9,7 +9,7 @@ import java.util.ArrayList;
 
 public interface SubjectClassRepository extends JpaRepository<SubjectClass, Integer> {
     boolean existsByName(String subjectClassName);
-    ArrayList<SubjectClass> getBySubjectIdAndTeacherId(Integer subjectId, Integer teacherId);
+    ArrayList<SubjectClass> getBySubjectIdAndTeacherEmail(Integer subjectId, String email);
     SubjectClass getById(Integer id);
     ArrayList<SubjectClass> getByTeacherId(Integer teacherId);
 
