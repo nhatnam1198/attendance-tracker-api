@@ -18,8 +18,8 @@ public class StatisticsController {
     EventService eventService;
     @GetMapping("api/statistics/reportFile")
     public @ResponseBody
-    ResponseEntity getStatisticsSheet(@RequestParam("subjectClassId") Integer subjectClassId) {
-        byte[] fileBytes = statisticsService.getStatisticsSheet(subjectClassId);
+    ResponseEntity getStatisticsSheet(@RequestParam("subjectClassId") Integer subjectClassId, @RequestParam("email") String email) {
+        byte[] fileBytes = statisticsService.getStatisticsSheet(subjectClassId, email);
         return new ResponseEntity(fileBytes, HttpStatus.OK);
     }
 

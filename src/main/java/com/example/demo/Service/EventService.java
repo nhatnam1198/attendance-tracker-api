@@ -103,9 +103,16 @@ public class EventService {
         return filteredEventList;
     }
 
-    public ArrayList<Event> getEventListBySubjectClassId(Integer subjectClassId) {
+    public ArrayList<Event> getEventListBySubjectClassId(Integer subjectClassId, String userName) {
         ArrayList<Event> eventArrayList = eventRepository.getBySubjectClassId(subjectClassId);
-        return eventArrayList;
+        ArrayList<Event> eventFilteredByUserName  = new ArrayList<>();
+        for (Event event : eventArrayList) {
+            String teacherName = event.getSubjectClass().getTeacher().getEmail();
+            if (teacherName.equals(userName)) {
+                eventFilteredByUserName.add(event);
+            }
+        }
+        return eventFilteredByUserName;
     }
 
     public void deleteEvent(Integer eventId) {

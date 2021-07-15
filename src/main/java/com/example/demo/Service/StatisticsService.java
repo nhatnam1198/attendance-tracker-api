@@ -9,6 +9,7 @@ import org.apache.poi.ss.util.CellRangeAddress;
 import org.apache.poi.util.IOUtils;
 import org.apache.poi.xssf.usermodel.XSSFFont;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
+import org.apache.tomcat.jni.Local;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -30,8 +31,8 @@ import java.util.List;
 public class StatisticsService {
     @Autowired
     EventService eventService;
-    public byte[] getStatisticsSheet(Integer subjectClassId) {
-        ArrayList<Event> eventArrayList = eventService.getEventListBySubjectClassId(subjectClassId);
+    public byte[] getStatisticsSheet(Integer subjectClassId, String email) {
+        ArrayList<Event> eventArrayList = eventService.getEventListBySubjectClassId(subjectClassId, email);
         Workbook workbook = new XSSFWorkbook();
 
         Sheet sheet = workbook.createSheet("Persons");
@@ -55,8 +56,10 @@ public class StatisticsService {
         titleStyle.setVerticalAlignment(VerticalAlignment.CENTER);
         Cell titleCell = title.createCell(1);
         String subjectClassName = eventArrayList.get(0).getSubjectClass().getName();
-        String classYearDate = new SimpleDateFormat("yyyy").format(eventArrayList.get(0).getDateTime());
-        titleCell.setCellValue("Điểm danh lớp " +  subjectClassName + " Năm " + classYearDate);
+        LocalDate eventDate = eventArrayList.get(0).getDateTime();
+        int eventYearDate = eventDate.getYear();
+//        String classYearDate = new SimpleDateFormat("yyyy").format();
+        titleCell.setCellValue("Điểm danh lớp " +  subjectClassName + " Năm " + eventYearDate);
         titleCell.setCellStyle(titleStyle);
 
         CellStyle headerStyle = workbook.createCellStyle();
@@ -160,9 +163,8 @@ public class StatisticsService {
             cell.setCellStyle(style);
 
             cell = row5.createCell(3 + i);
-            SimpleDateFormat simpleDateFormat = new SimpleDateFormat("dd/MM");
-            String date = simpleDateFormat.format(eventArrayList.get(i).getDateTime());
-            cell.setCellValue(date);
+            LocalDate eventDate = eventArrayList.get(i).getDateTime();
+            cell.setCellValue(eventDate.getDayOfMonth() + "/" + eventDate.getMonthValue());
             cell.setCellStyle(style);
             attendanceDetailList = eventArrayList.get(i).getAttendanceDetailsList();
             attendanceDetailList.sort(new Comparator<AttendanceDetails>() {
