@@ -2,10 +2,7 @@ package com.example.demo.Service;
 
 import Util.Const;
 import com.example.demo.DTO.EventDTO;
-import com.example.demo.Model.Attendance;
-import com.example.demo.Model.AttendanceDetails;
-import com.example.demo.Model.Event;
-import com.example.demo.Model.Student;
+import com.example.demo.Model.*;
 import com.example.demo.Repository.AttendanceDetailRepository;
 import com.example.demo.Repository.AttendanceRepository;
 import com.example.demo.Repository.EventRepository;
@@ -86,27 +83,25 @@ public class AttendanceDetailService {
     }
 
     public ArrayList<AttendanceDetails> getAttendedResultList(Integer eventId) {
-        ArrayList<AttendanceDetails> attendanceArrayList = attendanceDetailRepository.findByEventId(eventId);
-        for(int i = 0; i< attendanceArrayList.size(); i++){
-//            if(attendanceArrayList.get(i).getAttendance().getStudent().getEmbeddedImages() != null && attendanceArrayList.get(i).getAttendance().getStudent().getEmbeddedImages().size() != 0){
-//                profileImagePath = attendance.getStudent().getEmbeddedImages().get(0).getFilePath();
-//            }
-//            if(profileImagePath != null && profileImagePath.compareTo("") != 0){
-//                try {
-//                    FileInputStream inputStream = new FileInputStream(Const.IMAGE_STORAGE_PATH + profileImagePath);
-//                    byte[] bytes = IOUtils.toByteArray(inputStream);
-//                    attendance.getStudent().setProfileImage(bytes);
-//                } catch (FileNotFoundException e) {
-//                    e.printStackTrace();
-//                    continue;
-//                } catch (IOException e) {
-//                    e.printStackTrace();
-//                    continue;
-//                }
-//            }
+        ArrayList<AttendanceDetails> attendanceDetailsArrayList = attendanceDetailRepository.findByEventId(eventId);
+        for (AttendanceDetails attendanceDetails : attendanceDetailsArrayList) {
+            Attendance attendance = attendanceDetails.getAttendance();
+            String profileImagePath = "";
+            List<EmbeddedImage> embeddedImageList = attendance.getStudent().getEmbeddedImages();
+            if (embeddedImageList != null && embeddedImageList.size() != 0) {
+                profileImagePath = embeddedImageList.get(0).getFilePath();
+            }
+            if (profileImagePath != null && profileImagePath.compareTo("") != 0) {
+                try {
+                    FileInputStream inputStream = new FileInputStream(Const.IMAGE_STORAGE_PATH + profileImagePath);
+                    byte[] bytes = IOUtils.toByteArray(inputStream);
+                    attendance.getStudent().setProfileImage(bytes);
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+            }
         }
-
-        return attendanceArrayList;
+        return attendanceDetailsArrayList;
     }
 
     public ArrayList<AttendanceDetails> getLeaveOfAbsentRequestList(Integer eventId) {

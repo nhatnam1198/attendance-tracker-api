@@ -52,6 +52,8 @@ public class EventController {
         return new ResponseEntity(eventArrayList, HttpStatus.OK);
     }
 
+
+
     @GetMapping("api/event/")
     public @ResponseBody ResponseEntity getEventListBySubjectClassId(@RequestParam("subjectClassId") Integer subjectClassId, @RequestParam("email") String email){
         ArrayList<Event>eventArrayList  = eventService.getEventListBySubjectClassId(subjectClassId, email);

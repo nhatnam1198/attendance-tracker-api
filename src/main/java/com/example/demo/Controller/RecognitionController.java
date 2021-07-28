@@ -41,7 +41,7 @@ public class RecognitionController {
     EmbeddedImageService embeddedImageService;
     @PostMapping("api/recognition/student/video")
     public @ResponseBody
-    ResponseEntity recognizeFaceByVideo(@RequestParam("file") MultipartFile file) throws JsonProcessingException {
+    ResponseEntity recognizeFaceByVideo(@RequestParam MultipartFile file) throws JsonProcessingException {
         List<EmbeddedImage> embeddedImageList = embeddedImageService.findAll();
 
         List<ImageDTO> imageList = new ArrayList<>();
@@ -69,6 +69,7 @@ public class RecognitionController {
         Gson gson = new Gson();
         JsonObject jsonObject  = gson.fromJson(imageEmbeddingSet, JsonObject.class);
         JsonArray jsonArray = jsonObject.getAsJsonArray("results");
+
         ArrayList<Integer> imageEmbeddingList = new ArrayList<>();
         for(JsonElement jsonElement : jsonArray){
             imageEmbeddingList.add(jsonElement.getAsInt());
@@ -78,25 +79,36 @@ public class RecognitionController {
             return new ResponseEntity("Empty", HttpStatus.OK);
         }
 
-        Student student2 = new Student();
-        ArrayList<StudentDTO> studentDTOArrayList = new ArrayList<>();
+        Student student = new Student();
+        ArrayList<StudentDTO> studentList = new ArrayList<>();
         Set<Integer> studentIdSet = new HashSet<>();
         for(int i = 0; i< imageEmbeddingList.size(); i++){
-
-            student2 = studentRepository.findByEmbeddedImageId(imageEmbeddingList.get(i));
             StudentDTO studentDTO = new StudentDTO();
-            Integer studentId = student2.getId();
+            String profileImagePath = "";
+            student = studentRepository.findByEmbeddedImageId(imageEmbeddingList.get(i));
+            Integer studentId = student.getId();
             if(!studentIdSet.contains(studentId)){
-                studentIdSet.add(student2.getId());
-                studentDTO.setId(student2.getId());
-                studentDTO.setName(student2.getName());
-                studentDTO.setEmail(student2.getEmail());
-                studentDTOArrayList.add(studentDTO);
-            }else{
-                continue;
+                studentIdSet.add(studentId);
+                studentDTO.setId(studentId);
+                studentDTO.setName(student.getName());
+                studentDTO.setEmail(student.getEmail());
+                if(student.getEmbeddedImages() != null && student.getEmbeddedImages().size() != 0){
+                    profileImagePath = student.getEmbeddedImages().get(0).getFilePath();
+                }
+                if(profileImagePath != null && profileImagePath.compareTo("") != 0){
+                    try {
+                        FileInputStream inputStream = new FileInputStream(Const.IMAGE_STORAGE_PATH + profileImagePath);
+                        byte[] bytes = IOUtils.toByteArray(inputStream);
+                        studentDTO.setProfileImage(bytes);
+                        studentList.add(studentDTO);
+                    } catch (IOException e) {
+                        e.printStackTrace();
+                        studentList.add(studentDTO);
+                    }
+                }
             }
         }
-        return new ResponseEntity(studentDTOArrayList, HttpStatus.OK);
+        return new ResponseEntity(studentList, HttpStatus.OK);
     }
 
     @PostMapping("api/recognition/student/image")
