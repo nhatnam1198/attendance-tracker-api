@@ -10,6 +10,7 @@ import java.util.ArrayList;
 import java.util.List;
 @Entity
 @Table(name = "attendance")
+@JsonIgnoreProperties (value = { "hibernateLazyInitializer", "handler"})
 public class Attendance {
     @Id
     @Column(name = "attendance_id")
@@ -21,6 +22,7 @@ public class Attendance {
     private List<AttendanceDetails> attendanceDetailsList = new ArrayList<>();
 
     @JsonIgnoreProperties({"hibernateLazyInitializer", "handler"})
+//    @JsonBackReference("student-attendance")
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "student_id")
     private Student student;
@@ -31,7 +33,7 @@ public class Attendance {
         return id;
     }
 
-    @JsonIgnoreProperties({"hibernateLazyInitializer", "handler"})
+    @JsonBackReference("attendance-subject")
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "subject_class_id")
     private SubjectClass subjectClass;

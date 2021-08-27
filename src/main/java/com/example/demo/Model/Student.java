@@ -1,7 +1,9 @@
 package com.example.demo.Model;
 
+import com.fasterxml.jackson.annotation.JsonBackReference;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+import com.fasterxml.jackson.annotation.JsonManagedReference;
 
 import javax.persistence.*;
 import java.util.ArrayList;
@@ -9,6 +11,7 @@ import java.util.List;
 
 @Entity
 @Table(name = "student")
+@JsonIgnoreProperties (value = { "hibernateLazyInitializer", "handler"})
 public class Student {
     @Id
     @Column(name = "id")
@@ -24,7 +27,12 @@ public class Student {
     @Column(name = "student_code")
     private String studentCode;
 
+//    @JsonManagedReference("student-attendance")
+    @OneToMany(mappedBy = "student", cascade = CascadeType.ALL)
+    private List<Attendance> attendanceList = new ArrayList<>();
+
 //    @JsonIgnore
+//    @JsonManagedReference("embeddedimage-student")
     @OneToMany(mappedBy = "student", cascade = CascadeType.ALL)
     private List<EmbeddedImage> embeddedImages = new ArrayList<>();
     @Transient

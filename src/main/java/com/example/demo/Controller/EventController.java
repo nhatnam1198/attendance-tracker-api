@@ -4,6 +4,9 @@ import com.example.demo.DTO.EventDTO;
 import com.example.demo.Model.Event;
 import com.example.demo.Model.Teacher;
 import com.example.demo.Service.EventService;
+import com.example.demo.Service.MessageService;
+import com.fasterxml.jackson.core.Version;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpStatus;
@@ -16,6 +19,7 @@ import java.util.Date;
 @RestController
 public class EventController {
     @Autowired EventService eventService;
+    @Autowired MessageService messageService;
     @PostMapping("api/event")
     public @ResponseBody
     ResponseEntity addEvent(@RequestBody EventDTO event){
@@ -48,10 +52,18 @@ public class EventController {
     @GetMapping("api/event/{date}")
     public @ResponseBody
     ResponseEntity getEventByDateAndUserName(@PathVariable String date, @RequestParam("userName") String userName){
+
         ArrayList<Event> eventArrayList  = eventService.getEventByDateAndUserName(date, userName);
+//        return new ResponseEntity(messageService.sendMessage(), HttpStatus.OK);
+        return new ResponseEntity(eventArrayList, HttpStatus.OK);
+
+    }
+    @GetMapping("api/event/student/{date}")
+    public @ResponseBody
+    ResponseEntity getEventByDateAndStudentEmail(@PathVariable String date, @RequestParam("studentEmail") String userName){
+        ArrayList<Event> eventArrayList  = eventService.getEventByDateAndStudentEmail(date, userName);
         return new ResponseEntity(eventArrayList, HttpStatus.OK);
     }
-
 
 
     @GetMapping("api/event/")

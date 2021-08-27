@@ -7,7 +7,7 @@ import java.time.Instant;
 
 @Entity
 @Table(name = "attendance_detail")
-@JsonIgnoreProperties({"hibernateLazyInitializer", "handler", "event"})
+
 public class AttendanceDetails {
     @Id
     @Column(name = "attendance_details_id")
@@ -15,11 +15,13 @@ public class AttendanceDetails {
     private Integer id;
 
 
+    @JsonBackReference("event-attendanceDetail")
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "event_id")
     private Event event;
 
 
+//    @JsonBackReference("attendanceDetail-attendance")
     @JsonIgnoreProperties({"hibernateLazyInitializer", "handler"})
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "attendance_id")

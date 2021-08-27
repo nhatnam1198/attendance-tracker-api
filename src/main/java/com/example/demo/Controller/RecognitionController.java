@@ -1,44 +1,55 @@
 package com.example.demo.Controller;
 
 import Util.Const;
+import com.example.demo.DTO.EventDTO;
 import com.example.demo.DTO.ImageDTO;
 import com.example.demo.DTO.StudentDTO;
+import com.example.demo.Model.Attendance;
 import com.example.demo.Model.EmbeddedImage;
+import com.example.demo.Model.Event;
 import com.example.demo.Model.Student;
 import com.example.demo.Repository.StudentRepository;
+import com.example.demo.Service.AttendanceDetailService;
 import com.example.demo.Service.EmbeddedImageService;
+import com.example.demo.Service.EventService;
+import com.example.demo.Service.MessageService;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
+import com.google.auth.oauth2.GoogleCredentials;
+import com.google.firebase.FirebaseApp;
+import com.google.firebase.FirebaseOptions;
 import com.google.gson.Gson;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import org.apache.commons.compress.utils.IOUtils;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.autoconfigure.couchbase.CouchbaseProperties;
 import org.springframework.http.*;
 import org.springframework.util.LinkedMultiValueMap;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.ResponseBody;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 import org.springframework.web.client.RestTemplate;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.IOException;
-import java.util.ArrayList;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
+import java.util.*;
 
 @RestController
 public class RecognitionController {
     @Autowired
     private StudentRepository studentRepository;
-
+    @Autowired
+    AttendanceDetailService attendanceDetailService;
     @Autowired
     EmbeddedImageService embeddedImageService;
+    @Autowired
+    MessageService messageService;
+
+    @Autowired
+    EventService eventService;
     @PostMapping("api/recognition/student/video")
     public @ResponseBody
     ResponseEntity recognizeFaceByVideo(@RequestParam MultipartFile file) throws JsonProcessingException {
@@ -113,7 +124,7 @@ public class RecognitionController {
 
     @PostMapping("api/recognition/student/image")
     public @ResponseBody
-    ResponseEntity recognizeFaceByImage(@RequestParam("file") MultipartFile file){
+    ResponseEntity recognizeFaceByImage(@RequestParam("file") MultipartFile file) throws FileNotFoundException {
         List<EmbeddedImage> embeddedImageList = embeddedImageService.findAll();
         List<ImageDTO> imageList = new ArrayList<>();
         for (EmbeddedImage image :
@@ -185,4 +196,34 @@ public class RecognitionController {
         }
         return new ResponseEntity(studentList, HttpStatus.OK);
     }
+
+    @PostMapping("api/recognition/student/wifi")
+    public @ResponseBody
+    ResponseEntity recognizeStudentByWifi(@RequestBody HashMap<String, Object> map){
+        if(!map.containsKey("attendanceArrayList") || !map.containsKey("event")){
+            return new ResponseEntity(HttpStatus.BAD_REQUEST);
+        }
+        ArrayList<Attendance> attendanceArrayList = (ArrayList<Attendance>)map.get("attendanceArrayList");
+        ArrayList<Attendance> attendanceArrList = new ArrayList<>();
+        for (Object object :
+                attendanceArrayList) {
+            Attendance newAttendance = new Attendance();
+            newAttendance = new ObjectMapper().convertValue(object, Attendance.class);
+            attendanceArrList.add(newAttendance);
+        }
+
+        Event event = new ObjectMapper().registerModule(new JavaTimeModule()).convertValue(map.get("event"), Event.class);
+
+        if(attendanceDetailService.isExistsByEventId(event.getId())){
+            return new ResponseEntity(HttpStatus.CONFLICT);
+        }
+        attendanceDetailService.initAttendanceDetails(attendanceArrList, event);
+        messageService.sendAttendanceTrackerMessage(event);
+        EventDTO eventDTO = new EventDTO();
+        eventDTO.setId(event.getId());
+        eventDTO.setStatus(1);
+        eventService.updateStatus(eventDTO);
+        return  new ResponseEntity(HttpStatus.OK);
+    }
+
 }

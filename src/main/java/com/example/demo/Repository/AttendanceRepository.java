@@ -17,4 +17,6 @@ public interface AttendanceRepository extends JpaRepository<Attendance, Integer>
 
 //    @Query("select s from Attendance s where s.student.id in : studentIds")
     ArrayList<Attendance> findAllByStudentIdIn(Iterable<Integer> studentIds);
+
+    Attendance findByStudent(Student student);
 }

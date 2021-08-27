@@ -1,5 +1,8 @@
 package com.example.demo.Model;
 
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+import com.fasterxml.jackson.annotation.JsonManagedReference;
+
 import javax.persistence.*;
 import java.util.ArrayList;
 import java.util.Date;
@@ -26,6 +29,7 @@ public class Subject {
     public void setName(String name) {
         this.name = name;
     }
+
 
     @OneToMany(mappedBy = "subject", cascade = CascadeType.ALL)
     private List<SubjectClass> subjectClassList = new ArrayList<>();

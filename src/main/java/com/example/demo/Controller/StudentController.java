@@ -7,6 +7,7 @@ import com.example.demo.Model.EmbeddedImage;
 import com.example.demo.Model.Student;
 import com.example.demo.Repository.StudentRepository;
 import com.example.demo.Service.EmbeddedImageService;
+import com.example.demo.Service.StudentService;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.gson.*;
@@ -18,7 +19,13 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.client.RestTemplate;
 import org.springframework.web.multipart.MultipartFile;
 
-import java.io.IOException;
+import javax.imageio.IIOImage;
+import javax.imageio.ImageIO;
+import javax.imageio.ImageWriteParam;
+import javax.imageio.ImageWriter;
+import javax.imageio.stream.ImageOutputStream;
+import java.awt.image.BufferedImage;
+import java.io.*;
 import java.lang.reflect.Array;
 import java.lang.reflect.Type;
 import java.nio.file.Files;
@@ -30,7 +37,8 @@ import java.util.*;
 public class StudentController {
     @Autowired
     private StudentRepository studentRepository;
-
+    @Autowired
+    StudentService studentService;
     @Autowired
     EmbeddedImageService embeddedImageService;
     @PostMapping("api/student")
@@ -48,7 +56,7 @@ public class StudentController {
         }
     }
     @PostMapping("api/student/embeddedImage")
-    public @ResponseBody ResponseEntity addEmbeddingVector(@RequestParam Integer studentId, @RequestParam("file") MultipartFile multipartFile){
+    public @ResponseBody ResponseEntity addEmbeddingVector(@RequestParam String userEmail, @RequestParam("file") MultipartFile multipartFile){
         RestTemplate restTemplate = new RestTemplate();
         String fooResourceUrl
                 = Const.DOMAIN_NAME + "v1/resources/person/add";
@@ -61,34 +69,71 @@ public class StudentController {
         ResponseEntity<String> response
                 = restTemplate.postForEntity(fooResourceUrl, requestEntity, String.class);
         String predicted_vector = response.getBody().toString();
+        if(predicted_vector.equals("")){
+            return  new ResponseEntity(HttpStatus.BAD_REQUEST);
+        }
 
-        String path = Const.IMAGE_STORAGE_PATH + studentId+"/" + multipartFile.getOriginalFilename();
-        // Create directory if not exists
-        try {
-            Files.createDirectories(Paths.get(Const.IMAGE_STORAGE_PATH + studentId));
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-        try {
-            Files.copy(multipartFile.getInputStream(), Paths.get(path), StandardCopyOption.REPLACE_EXISTING);
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
+
 
         Student student = new Student();
-        Optional<Student> optionalStudent = studentRepository.findById(studentId);
+        Optional<Student> optionalStudent = studentService.getStudentByEmail(userEmail);
         if(optionalStudent.isPresent()){
             student = optionalStudent.get();
         }else{
             return new ResponseEntity(HttpStatus.INTERNAL_SERVER_ERROR);
         }
+        String path = Const.IMAGE_STORAGE_PATH + student.getId()+"/" + multipartFile.getOriginalFilename();
+        // Create directory if not exists
+        try {
+            Files.createDirectories(Paths.get(Const.IMAGE_STORAGE_PATH + student.getId()));
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        try {
+            saveImageToDirectory(multipartFile, path);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
         EmbeddedImage embeddedImage = new EmbeddedImage();
         embeddedImage.setStudent(student);
         embeddedImage.setEmbeddingVector(predicted_vector);
-        embeddedImage.setFilePath(studentId+"/"+multipartFile.getOriginalFilename());
+        embeddedImage.setFilePath(student.getId()+"/"+multipartFile.getOriginalFilename());
         student.getEmbeddedImages().add(embeddedImage);
         studentRepository.save(student);
         return new ResponseEntity(HttpStatus.OK);
+    }
+
+    private void saveImageToDirectory(MultipartFile image, String path) throws IOException {
+//        try {
+//            Files.copy(image.getInputStream(), Paths.get(path), StandardCopyOption.REPLACE_EXISTING);
+//        } catch (IOException e) {
+//            e.printStackTrace();
+//        }
+        BufferedImage bufferedImage = ImageIO.read(image.getInputStream());
+
+        File output = new File(path);
+        OutputStream out = new FileOutputStream(output);
+
+        ImageWriter writer =  ImageIO.getImageWritersByFormatName("jpg").next();
+        ImageOutputStream ios = ImageIO.createImageOutputStream(out);
+        writer.setOutput(ios);
+
+        // reduce the quality of the image
+        ImageWriteParam param = writer.getDefaultWriteParam();
+        if (param.canWriteCompressed()){
+            param.setCompressionMode(ImageWriteParam.MODE_EXPLICIT);
+            param.setCompressionQuality(0.05f);
+        }
+        writer.write(null, new IIOImage(bufferedImage, null, null), param);
+
+        out.close();
+        ios.close();
+        writer.dispose();
+    }
+
+    private void reduceImageResolution(MultipartFile file) throws IOException {
+//        File input = new File("C:/Users/Asus/Downloads/IMG_3222.JPG");
+
     }
 
     @GetMapping("/student")

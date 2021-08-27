@@ -1,8 +1,6 @@
 package com.example.demo.Model;
 
-import com.fasterxml.jackson.annotation.JsonFormat;
-import com.fasterxml.jackson.annotation.JsonIgnore;
-import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+import com.fasterxml.jackson.annotation.*;
 
 import javax.persistence.*;
 import java.time.LocalDate;
@@ -12,6 +10,7 @@ import java.util.List;
 
 @Entity
 @Table(name = "subject_class")
+
 public class SubjectClass {
     @Id
     @Column(name = "subject_class_id")
@@ -19,6 +18,15 @@ public class SubjectClass {
     private Integer id;
 
 
+    public List<Attendance> getAttendanceList() {
+        return attendanceList;
+    }
+
+    public void setAttendanceList(List<Attendance> attendanceList) {
+        this.attendanceList = attendanceList;
+    }
+
+    @JsonManagedReference("attendance-subject")
     @OneToMany(mappedBy = "subjectClass", cascade = CascadeType.ALL)
     private List<Attendance> attendanceList = new ArrayList<>();
 
@@ -87,13 +95,14 @@ public class SubjectClass {
     @Column(name = "status")
     private int status;
 
-    @JsonIgnoreProperties({"hibernateLazyInitializer", "handler"})
-    @ManyToOne(fetch = FetchType.LAZY)
+
+
+    @ManyToOne(fetch = FetchType.EAGER)
     @JoinColumn(name = "subject_id")
     private Subject subject;
 
-    @JsonIgnore
-    @ManyToOne(fetch = FetchType.LAZY)
+//    @JsonIgnore
+    @ManyToOne(fetch = FetchType.EAGER)
     @JoinColumn(name = "teacher_id")
     private Teacher teacher;
 }

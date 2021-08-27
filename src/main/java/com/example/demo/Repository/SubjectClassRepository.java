@@ -14,4 +14,5 @@ public interface SubjectClassRepository extends JpaRepository<SubjectClass, Inte
     ArrayList<SubjectClass> getByTeacherId(Integer teacherId);
 
     ArrayList<SubjectClass> getByTeacher(Teacher teacher);
+
 }

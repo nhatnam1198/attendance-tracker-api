@@ -67,6 +67,7 @@ public class SubjectClassService {
         return subjectClassArrayList;
     }
 
+
     public List<SubjectClass> getByTeacherId(Integer teacherId) {
         return subjectClassRepository.getByTeacherId(teacherId);
     }

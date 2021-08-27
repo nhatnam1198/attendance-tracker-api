@@ -17,4 +17,5 @@ public interface StudentRepository  extends JpaRepository<Student, Integer> {
     public Student findByEmbeddedImageId(Integer embeddedId);
 
     public boolean existsByEmail(String email);
+    public Student findByEmail(String email);
 }

@@ -20,6 +20,7 @@ public class Teacher {
     private String email;
     @Column(name = "phone_number")
     private String phoneNumber;
+
     @OneToMany(mappedBy = "teacher", cascade = CascadeType.ALL)
     private List<SubjectClass> subjectClassList = new ArrayList<>();
 

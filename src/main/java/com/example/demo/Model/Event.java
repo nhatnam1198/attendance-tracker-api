@@ -24,6 +24,7 @@ public class Event {
     }
 
 
+    @JsonManagedReference("event-attendanceDetail")
     @OneToMany(mappedBy = "event", cascade = CascadeType.ALL)
     private List<AttendanceDetails> attendanceDetailsList = new ArrayList<>();
 
@@ -103,4 +104,5 @@ public class Event {
     public void setStatus(int status) {
         this.status = status;
     }
+
 }

@@ -1,10 +1,7 @@
 package com.example.demo.Service;
 
 import com.example.demo.DTO.EventDTO;
-import com.example.demo.Model.Event;
-import com.example.demo.Model.Shift;
-import com.example.demo.Model.SubjectClass;
-import com.example.demo.Model.Teacher;
+import com.example.demo.Model.*;
 import com.example.demo.Repository.EventRepository;
 import com.example.demo.Repository.TeacherRepository;
 import org.apache.tomcat.jni.Local;
@@ -117,6 +114,24 @@ public class EventService {
 
     public void deleteEvent(Integer eventId) {
         eventRepository.deleteById(eventId);
+    }
+
+    public ArrayList<Event> getEventByDateAndStudentEmail(String date, String userName) {
+        DateTimeFormatter dateTimeFormatter = DateTimeFormatter.ofPattern("yyyy-M-d");
+        LocalDate localDate = LocalDate.parse(date, dateTimeFormatter);
+        ArrayList<Event> eventArrayList = eventRepository.getByDateTime(localDate);
+        ArrayList<Event> filteredEventList  = new ArrayList<>();
+        for(int i = 0; i< eventArrayList.size(); i++){
+            Event event = eventArrayList.get(i);
+            SubjectClass subjectClass = event.getSubjectClass();
+            for(int j = 0; j< subjectClass.getAttendanceList().size(); j++){
+                if(subjectClass.getAttendanceList().get(j).getStudent().getEmail().equals(userName)){
+                    filteredEventList.add(event);
+                }
+            }
+
+        }
+        return filteredEventList;
     }
 }
 

@@ -71,7 +71,22 @@ public class AttendanceDetailService {
             eventService.updateStatus(eventDTO);
         }
     }
+    public void initAttendanceDetails(ArrayList<Attendance> attendanceArrayList , Event event){
+        Optional<Event> optionalEvent = eventService.findById(event.getId());
+        if(optionalEvent.isPresent()) {
+            Event dbEvent = optionalEvent.get();
+            for (Attendance attendance: attendanceArrayList
+                 ) {
+                AttendanceDetails attendanceDetail = new AttendanceDetails();
+                Integer status = Const.ABSENT;
+                attendanceDetail.setEvent(dbEvent);
+                attendanceDetail.setAttendance(attendance);
+                attendanceDetail.setStatus(status);
+                attendanceDetailRepository.saveAndFlush(attendanceDetail);
+            }
 
+        }
+    }
     public boolean isExistsByEventId(Integer eventId){
         ArrayList<Integer> status = new ArrayList<>();
         status.add(Const.LEAVE_OF_ABSENCE_REQUEST);
@@ -133,6 +148,23 @@ public class AttendanceDetailService {
             if(statusMap.containsKey(attendanceDetail.getId())){
                 attendanceDetail.setStatus(statusMap.get(attendanceDetail.getId()));
                 attendanceDetailRepository.save(attendanceDetail);
+            }
+        }
+    }
+
+    public AttendanceDetails getAttendanceDetailStatusByEventIdAndUserEmail(Integer eventId, String userEmail) {
+        Attendance attendance = attendanceService.getAttendanceByUserEmail(userEmail);
+        return attendanceDetailRepository.findAttendanceDetailsByAttendanceAndEventId(attendance, eventId);
+    }
+
+    public void updateAttendanceDetailSingle(Integer eventId, String studentEmail) {
+        ArrayList<AttendanceDetails>  attendanceDetailsArrayList = attendanceDetailRepository.findByEventId(eventId);
+        for (AttendanceDetails attendanceDetails:
+                attendanceDetailsArrayList) {
+            Student student = attendanceDetails.getAttendance().getStudent();
+            if(student.getEmail().equals(studentEmail)){
+                attendanceDetails.setStatus(Const.ATTENDED);
+                attendanceDetailRepository.save(attendanceDetails);
             }
         }
     }

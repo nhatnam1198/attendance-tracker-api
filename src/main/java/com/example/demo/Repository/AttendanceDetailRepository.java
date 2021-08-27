@@ -18,4 +18,6 @@ public interface AttendanceDetailRepository extends JpaRepository<AttendanceDeta
 
     @Override
     ArrayList<AttendanceDetails> findAllById(Iterable<Integer> iterable);
+
+    AttendanceDetails findAttendanceDetailsByAttendanceAndEventId(Attendance attendance, int eventId);
 }

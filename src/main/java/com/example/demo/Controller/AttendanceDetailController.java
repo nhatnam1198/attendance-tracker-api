@@ -49,6 +49,42 @@ public class AttendanceDetailController {
         return new ResponseEntity(HttpStatus.OK);
 
     }
+    @PostMapping("api/attendanceDetails/init")
+    public @ResponseBody
+    ResponseEntity initAttendanceDetails(@RequestBody HashMap<String, Object> map) {
+        if(!map.containsKey("attendanceArrayList") || !map.containsKey("event")){
+            return new ResponseEntity(HttpStatus.BAD_REQUEST);
+        }
+        ArrayList<Attendance> attendanceArrayList = (ArrayList<Attendance>)map.get("attendanceArrayList");
+        ArrayList<Attendance> attendanceArrList = new ArrayList<>();
+        for (Object object :
+                attendanceArrayList) {
+            Attendance newAttendance = new Attendance();
+            newAttendance = new ObjectMapper().convertValue(object, Attendance.class);
+            attendanceArrList.add(newAttendance);
+        }
+
+        Event event = new ObjectMapper().registerModule(new JavaTimeModule()).convertValue(map.get("event"), Event.class);
+
+        if(attendanceDetailService.isExistsByEventId(event.getId())){
+            return new ResponseEntity(HttpStatus.CONFLICT);
+        }
+        attendanceDetailService.initAttendanceDetails(attendanceArrList, event);
+
+        return new ResponseEntity(HttpStatus.OK);
+
+    }
+    @PutMapping("api/attendanceDetail/single")
+    public @ResponseBody
+    ResponseEntity updateAttendanceDetailSingle(@RequestParam("eventId") Integer eventId, @RequestParam("email") String studentEmail) {
+//        if(attendanceDetailService.isExistsByEventId(eventId)){
+//            return new ResponseEntity(HttpStatus.CONFLICT);
+//        }
+        attendanceDetailService.updateAttendanceDetailSingle(eventId, studentEmail);
+        return new ResponseEntity(HttpStatus.OK);
+
+    }
+
 
     @GetMapping("api/attendanceDetail/attendedResult/list")
     public @ResponseBody ResponseEntity getAttendedResultList(@RequestParam("eventId") Integer eventId){
@@ -71,5 +107,14 @@ public class AttendanceDetailController {
     public @ResponseBody ResponseEntity updateAttendanceDetail(@RequestBody ArrayList<AttendanceDetails> attendanceDetailsArrayList){
         attendanceDetailService.updateAttendanceDetail(attendanceDetailsArrayList);
         return new ResponseEntity(HttpStatus.OK);
+    }
+
+    @GetMapping("api/attendanceDetail/status")
+    public @ResponseBody ResponseEntity getAttendanceDetailStatusByEventIdAndUserEmail(@RequestParam("eventId") Integer eventId, @RequestParam("userEmail") String userEmail){
+        AttendanceDetails attendanceDetails = attendanceDetailService.getAttendanceDetailStatusByEventIdAndUserEmail(eventId, userEmail);
+        if(attendanceDetails == null){
+            return new ResponseEntity(HttpStatus.NOT_FOUND);
+        }
+        return new ResponseEntity(attendanceDetails, HttpStatus.OK);
     }
 }

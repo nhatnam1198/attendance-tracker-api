@@ -176,7 +176,14 @@ public class StatisticsService {
             for (int j = 0; j < attendanceDetailList.size(); j++) {
                 int status = attendanceDetailList.get(j).getStatus();
                 Row row = sheet.getRow(6 + j);
+                if(row == null){
+                    row = sheet.createRow(6+j);
+                }
+
                 cell = row.createCell(3 + i);
+//                if(cell == null){
+//                    i =3;
+//                }
                 if(status == Const.ATTENDED){
                     cell.setCellValue("X");
                 }else if(status == Const.ABSENT){
@@ -189,6 +196,5 @@ public class StatisticsService {
                 cell.setCellStyle(style);
             }
         }
-
     }
 }
