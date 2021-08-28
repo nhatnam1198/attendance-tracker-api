@@ -6,7 +6,7 @@ This service is being used in Attendance Tracker app domain. Used to manage enti
 - Spring boot 2.4.5
 - Java 8
 
-The recommended me JDK to build this project is JDK 1.8
+The recommended JDK to build this project is JDK 1.8
 
 JDK 1.8 Installation for Mac user:
 ```sh
